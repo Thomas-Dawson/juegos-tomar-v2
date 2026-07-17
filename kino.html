@@ -4,16 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#100a1f">
-  <title>The List</title>
+  <title>El kino</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="game-shell">
-    <section class="game-intro"><p class="eyebrow">Juego 04</p><h1>The List</h1><p></p></section>
+    <section class="game-intro"><p class="eyebrow">Juego 05</p><h1>El kino</h1><p></p></section>
     <section class="game-content">
-      <p></p>
-      <div class="action-grid"><button class="action-btn" type="button" onclick="kissListLugar()">📍 Lugar</button><button class="action-btn" type="button" onclick="kissListDesafio()">⚡ Desafío</button><button class="action-btn" type="button" onclick="kissListPosicion()">✦ Posición</button></div>
-      <div id="kiss-list-resultado" class="resultado" aria-live="polite"></div>
+      <p>Elige del 1 al 157, o deja el 0 para uno aleatorio.</p>
+      <div class="number-form"><input type="number" id="numero-input" min="0" max="157" value="0" placeholder="0 — aleatorio" aria-label="Número de reto"><button class="action-btn" type="button" onclick="kino(document.getElementById('numero-input').value)">Mostrar reto</button></div>
+      <div id="la-polla-resultado" class="resultado" aria-live="polite"></div>
     </section>
     <div class="back-menu"><a href="index.html" class="back-btn">← Volver a los juegos</a></div>
   </main>

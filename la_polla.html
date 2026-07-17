@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#100a1f">
+  <title>El kino · Después de las 12</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header"><a class="brand" href="index.html"><span class="brand-mark">✦</span> Después de las 12</a><a class="header-link" href="index.html">← Juegos</a></header>
+  <main class="game-shell">
+    <section class="game-intro"><p class="eyebrow">Juego 04</p><h1>El kino</h1><p>Un número, un reto y una nueva regla para la ronda.</p></section>
+    <section class="game-content">
+      <p>Elige del 1 al 157, o usa el 0 para sacar un reto al azar.</p>
+      <div class="number-form"><input type="number" id="numero-input" min="0" max="157" value="0" placeholder="0 — aleatorio" aria-label="Número de reto"><button class="action-btn" type="button" onclick="laPolla(document.getElementById('numero-input').value)">Mostrar reto</button></div>
+      <div id="la-polla-resultado" class="resultado" aria-live="polite"></div>
+    </section>
+    <div class="back-menu"><a href="index.html" class="back-btn">← Volver a los juegos</a></div>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

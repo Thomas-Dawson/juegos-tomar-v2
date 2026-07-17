@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#100a1f">
+  <title>The List · Después de las 12</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header"><a class="brand" href="index.html"><span class="brand-mark">✦</span> Después de las 12</a><a class="header-link" href="index.html">← Juegos</a></header>
+  <main class="game-shell">
+    <section class="game-intro"><p class="eyebrow">Juego 03</p><h1>The List</h1><p>Elige la categoría y deja que el reto haga lo suyo.</p></section>
+    <section class="game-content">
+      <p>¿Qué quieres descubrir esta vez?</p>
+      <div class="action-grid"><button class="action-btn" type="button" onclick="kissListLugar()">📍 Lugar</button><button class="action-btn" type="button" onclick="kissListDesafio()">⚡ Desafío</button><button class="action-btn" type="button" onclick="kissListPosicion()">✦ Posición</button></div>
+      <div id="kiss-list-resultado" class="resultado" aria-live="polite"></div>
+    </section>
+    <div class="back-menu"><a href="index.html" class="back-btn">← Volver a los juegos</a></div>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

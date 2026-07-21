@@ -13,15 +13,18 @@
   const state = { players:[], avatar:AVATARS[0], boardType:"classic", board:[], enabled:[], current:0, moving:false, pending:null };
   const $ = id => document.getElementById(id);
   const random = array => array[Math.floor(Math.random()*array.length)];
-  const avatarHTML = p => `<span class="player-avatar" style="--player-color:${p.color}">${p.avatar.startsWith("data:") ? `<img src="${p.avatar}" alt="">` : p.avatar}</span>`;
+  const avatarHTML = p => `<span class="player-avatar" style="--player-color:${p.color}">${avatarVisual(p)}</span>`;
 
   function renderAvatarChoices(){ $("avatar-picks").innerHTML = AVATARS.map((a,i)=>`<button class="avatar-pick ${i===0?"selected":""}" type="button" data-avatar="${a}">${a}</button>`).join(""); }
   function renderPlayers(){
     $("player-count").textContent = `${state.players.length} / 12`;
     $("go-mode").disabled = state.players.length < 2;
-    $("players-list").innerHTML = state.players.length ? state.players.map((p,i)=>`<div class="player-row" style="--player-color:${p.color}">${avatarHTML(p)}<strong>${escapeText(p.name)}</strong><i class="player-color"></i><button class="remove-player" type="button" data-remove="${i}">Eliminar</button></div>`).join("") : '<div class="empty-players"></div>';
+    $("players-list").innerHTML = state.players.length ? state.players.map((p,i)=>`<div class="player-row" style="--player-color:${p.color}">${avatarHTML(p)}<strong>${escapeText(displayName(p.name))}</strong><i class="player-color"></i><button class="remove-player" type="button" data-remove="${i}">Eliminar</button></div>`).join("") : '<div class="empty-players"></div>';
   }
   function escapeText(value){ const e=document.createElement("span"); e.textContent=value; return e.innerHTML; }
+  function isFoxPlayer(name){ const normalized=name.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase(); return normalized.includes("edu") || normalized.includes("itu"); }
+  function displayName(name){ return `${name}${isFoxPlayer(name) ? " 🪇" : ""}`; }
+  function avatarVisual(player){ return isFoxPlayer(player.name) ? "🦊" : player.avatar.startsWith("data:") ? `<img src="${player.avatar}" alt="">` : player.avatar; }
   function showScreen(id){ document.querySelectorAll(".route-screen").forEach(s=>s.classList.toggle("active",s.id===id)); window.scrollTo({top:0,behavior:"smooth"}); }
   function enabledModes(){ const values=[...document.querySelectorAll(".mode-toggles input:checked")].map(i=>i.value); return values.length ? values : ["regla"]; }
   function lengthFor(type){ return type==="flash" ? 15 : type==="extreme" ? 42 : type==="hot" ? 28 : 28; }
@@ -44,22 +47,22 @@
       const logicalRow=rows-1-visualRow, start=logicalRow*7+1, group=[];
       for(let col=0;col<7;col++){const n=start+col;if(n<=length)group.push(n);}
       if(logicalRow%2===1) group.reverse();
-      group.forEach(n=>{const c=state.board[n-1], isSpecial=!!c.special, icon=isSpecial?c.special.icon:(c.type==="start"?"🚩":c.type==="finish"?"🏆":META[c.type][0]); const players=state.players.filter(p=>p.position===n); cells.push(`<div class="cell ${isSpecial?"special":c.type}" data-cell="${n}"><span class="cell-icon">${icon}</span><span class="cell-num">${n}</span><div class="tokens">${players.map(p=>`<span class="token" style="--player-color:${p.color}">${p.avatar.startsWith("data:")?`<img src="${p.avatar}" alt="">`:p.avatar}</span>`).join("")}</div></div>`);});
+      group.forEach(n=>{const c=state.board[n-1], isSpecial=!!c.special, icon=isSpecial?c.special.icon:(c.type==="start"?"🚩":c.type==="finish"?"🏆":META[c.type][0]); const players=state.players.filter(p=>p.position===n); cells.push(`<div class="cell ${isSpecial?"special":c.type}" data-cell="${n}"><span class="cell-icon">${icon}</span><span class="cell-num">${n}</span><div class="tokens">${players.map(p=>`<span class="token" style="--player-color:${p.color}">${avatarVisual(p)}</span>`).join("")}</div></div>`);});
     }
     board.innerHTML=cells.join("");
     $("board-legend").innerHTML=state.enabled.map(t=>`<span>${META[t][0]} ${META[t][1]}</span>`).join("");
     renderControl();
   }
-  function renderControl(){ const p=state.players[state.current]; if(!p)return; $("current-player").innerHTML=`${avatarHTML(p)}<span>${escapeText(p.name)}</span>`; $("turn-pill").textContent=`Casilla ${p.position} de ${state.board.length}`; $("score-list").innerHTML=state.players.map(p=>`<div class="score-row">${avatarHTML(p)}<b>${escapeText(p.name)}</b><span>${p.position}</span></div>`).join(""); }
+  function renderControl(){ const p=state.players[state.current]; if(!p)return; $("current-player").innerHTML=`${avatarHTML(p)}<span>${escapeText(displayName(p.name))}</span>`; $("turn-pill").textContent=`Casilla ${p.position} de ${state.board.length}`; $("score-list").innerHTML=state.players.map(p=>`<div class="score-row">${avatarHTML(p)}<b>${escapeText(displayName(p.name))}</b><span>${p.position}</span></div>`).join(""); }
   function setDice(n){ const map={1:[2],2:[0,4],3:[0,2,4],4:[0,1,3,4],5:[0,1,2,3,4],6:[0,1,3,4,5]}; [...$("dice").children].forEach((dot,i)=>dot.classList.toggle("show",map[n].includes(i))); }
   const wait=ms=>new Promise(r=>setTimeout(r,ms));
   async function roll(){ if(state.moving)return; state.moving=true; const button=$("roll-dice");button.disabled=true;$("dice").classList.add("rolling"); $("dice-copy").textContent="Rodando…"; await wait(720); const n=Math.floor(Math.random()*6)+1;setDice(n);$("dice").classList.remove("rolling");$("dice-copy").textContent=`Sacaste ${n}`; await movePlayer(n);button.disabled=false;state.moving=false; }
   async function movePlayer(steps){ const p=state.players[state.current], target=Math.min(state.board.length,p.position+steps); for(let i=p.position+1;i<=target;i++){p.position=i;renderBoard();await wait(260);} if(p.position>=state.board.length){win(p);return;} await resolveCell(state.board[p.position-1]); }
-  async function resolveCell(cell){ if(cell.special){ $("modal-icon").textContent=cell.special.icon;$("modal-type").textContent="Casilla especial";$("modal-title").textContent=cell.special.label;$("modal-text").textContent=cell.special.kind==="all"?"Todos toman 1. ¡Salud!":cell.special.amount>0?"Después de cerrar esto avanzarás 2 casillas.":"Después de cerrar esto retrocederás 1 casilla.";state.pending={special:cell.special};openModal();return; } const [icon,name]=META[cell.type];$("modal-icon").textContent=icon;$("modal-type").textContent=name;$("modal-title").textContent=state.players[state.current].name;$("modal-text").textContent=random(CONTENT[cell.type]);state.pending=null;openModal(); }
+  async function resolveCell(cell){ if(cell.special){ $("modal-icon").textContent=cell.special.icon;$("modal-type").textContent="Casilla especial";$("modal-title").textContent=cell.special.label;$("modal-text").textContent=cell.special.kind==="all"?"Todos toman 1. ¡Salud!":cell.special.amount>0?"Después de cerrar esto avanzarás 2 casillas.":"Después de cerrar esto retrocederás 1 casilla.";state.pending={special:cell.special};openModal();return; } const [icon,name]=META[cell.type];$("modal-icon").textContent=icon;$("modal-type").textContent=name;$("modal-title").textContent=displayName(state.players[state.current].name);$("modal-text").textContent=random(CONTENT[cell.type]);state.pending=null;openModal(); }
   function openModal(){ $("challenge-modal").classList.add("open"); }
   async function finishChallenge(failed=false){ $("challenge-modal").classList.remove("open"); if(failed)$("dice-copy").textContent="Toma 2 tragos 🍻"; const special=state.pending?.special; state.pending=null; if(special?.amount){const p=state.players[state.current], to=Math.max(1,Math.min(state.board.length,p.position+special.amount));const direction=to>p.position?1:-1;while(p.position!==to){p.position+=direction;renderBoard();await wait(230);}if(p.position>=state.board.length){win(p);return;}} nextTurn(); }
   function nextTurn(){ state.current=(state.current+1)%state.players.length;renderBoard();$("dice-copy").textContent="Lanza el dado"; }
-  function win(p){ $("winner-name").textContent=`${p.name} gana`; $("win-modal").classList.add("open"); }
+  function win(p){ $("winner-name").textContent=`${displayName(p.name)} gana`; $("win-modal").classList.add("open"); }
   function start(){ state.players.forEach(p=>p.position=1);state.current=0;buildBoard();renderBoard();setDice(1);showScreen("game-screen"); }
   $("player-form").addEventListener("submit",e=>{e.preventDefault();const name=$("player-name").value.trim();if(!name||state.players.length===12)return;state.players.push({name,avatar:state.avatar,color:COLORS[state.players.length],position:1});$("player-name").value="";state.avatar=AVATARS[0];document.querySelectorAll(".avatar-pick").forEach((b,i)=>b.classList.toggle("selected",i===0));$("avatar-file").value="";renderPlayers();});
   $("avatar-picks").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;state.avatar=b.dataset.avatar;document.querySelectorAll(".avatar-pick").forEach(x=>x.classList.toggle("selected",x===b));});

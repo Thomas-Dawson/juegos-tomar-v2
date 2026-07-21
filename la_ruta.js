@@ -19,7 +19,7 @@
   function renderPlayers(){
     $("player-count").textContent = `${state.players.length} / 12`;
     $("go-mode").disabled = state.players.length < 2;
-    $("players-list").innerHTML = state.players.length ? state.players.map((p,i)=>`<div class="player-row" style="--player-color:${p.color}">${avatarHTML(p)}<strong>${escapeText(p.name)}</strong><i class="player-color"></i><button class="remove-player" type="button" data-remove="${i}">Eliminar</button></div>`).join("") : '<div class="empty-players">Agrega a tu primera víctima… digo, jugador.</div>';
+    $("players-list").innerHTML = state.players.length ? state.players.map((p,i)=>`<div class="player-row" style="--player-color:${p.color}">${avatarHTML(p)}<strong>${escapeText(p.name)}</strong><i class="player-color"></i><button class="remove-player" type="button" data-remove="${i}">Eliminar</button></div>`).join("") : '<div class="empty-players"></div>';
   }
   function escapeText(value){ const e=document.createElement("span"); e.textContent=value; return e.innerHTML; }
   function showScreen(id){ document.querySelectorAll(".route-screen").forEach(s=>s.classList.toggle("active",s.id===id)); window.scrollTo({top:0,behavior:"smooth"}); }
